@@ -260,7 +260,7 @@
   }
   .export-btn:hover { border-color: var(--ink3); color: var(--ink); background: var(--surface); }
   .export-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
+  
   /* ─── EMPTY STATE ─── */
   .empty-state {
     flex: 1;
@@ -393,39 +393,47 @@
   .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
   /* ─── API KEY BANNER ─── */
-  .api-banner {
-    background: var(--gold-light);
-    border: 1px solid #e8d080;
-    border-radius: var(--radius);
-    padding: 10px 14px;
-    font-size: 12px;
-    color: #7a5800;
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    margin-bottom: 4px;
-  }
-  .api-key-row {
-    display: flex;
-    gap: 6px;
-    margin-top: 8px;
-  }
-  .api-key-row input {
-    flex: 1;
-    font-size: 12px;
-    padding: 7px 10px;
-    font-family: monospace;
-  }
-  .api-key-row button {
-    padding: 7px 12px;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius);
-    font-size: 12px;
-    cursor: pointer;
-    white-space: nowrap;
-  }
+ /* Update these specific rules in your <style> section */
+.api-banner {
+  background: var(--gold-light);
+  border: 1px solid #e8d080;
+  border-radius: var(--radius);
+  padding: 12px; /* Increased padding */
+  font-size: 12px;
+  color: #7a5800;
+  display: flex;
+  flex-direction: column; /* Stack the text and the input row vertically */
+  gap: 10px;
+  margin-bottom: 20px; /* Give it more room at the bottom */
+  width: 100%; /* Ensure it takes full width of sidebar */
+}
+
+.api-key-row {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  align-items: center; /* Align input and button perfectly */
+}
+
+/* Add this to ensure the button doesn't shrink or hide */
+.api-key-row button {
+  flex-shrink: 0; 
+  height: 32px;
+  padding: 0 16px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+
+.api-key-row button:hover {
+  opacity: 0.9;
+}
 
   /* ─── ERROR STATE ─── */
   .error-banner {
@@ -496,7 +504,8 @@
             <option value="anthropic">Anthropic (Claude)</option>
           </select>
           <input type="password" id="api-key-input" placeholder="Paste your API key..." style="flex:1;font-size:12px;padding:7px 10px;font-family:monospace;" />
-          <button onclick="saveApiKey()" style="padding:7px 12px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-size:12px;cursor:pointer;white-space:nowrap;">Save</button>
+          <button onclick="saveApiKey()" style="padding:7px 12px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-size:12px;
+            cursor:pointer;white-space:nowrap;">Save</button>
         </div>
         <div style="font-size:11px;margin-top:6px;color:#7a5800;">OpenAI key starts with <code>sk-...</code> &nbsp;·&nbsp; Anthropic key starts with <code>sk-ant-...</code></div>
       </div>

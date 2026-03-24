@@ -488,12 +488,17 @@
 
     <div class="api-banner" id="api-banner-f1">
       <span>⚙</span>
-      <div>
-        Enter your GPT OpenAI API key to activate the agent.
-        <div class="api-key-row">
-          <input type="password" id="api-key-input" placeholder="sk-ant-..." />
-          <button onclick="saveApiKey()">Save</button>
+      <div style="width:100%">
+        Select your AI provider and enter your API key.
+        <div style="display:flex;gap:6px;margin-top:8px;">
+          <select id="provider-select" style="width:140px;font-size:12px;padding:7px 10px;flex-shrink:0;">
+            <option value="openai">OpenAI (GPT-4o)</option>
+            <option value="anthropic">Anthropic (Claude)</option>
+          </select>
+          <input type="password" id="api-key-input" placeholder="Paste your API key..." style="flex:1;font-size:12px;padding:7px 10px;font-family:monospace;" />
+          <button onclick="saveApiKey()" style="padding:7px 12px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-size:12px;cursor:pointer;white-space:nowrap;">Save</button>
         </div>
+        <div style="font-size:11px;margin-top:6px;color:#7a5800;">OpenAI key starts with <code>sk-...</code> &nbsp;·&nbsp; Anthropic key starts with <code>sk-ant-...</code></div>
       </div>
     </div>
 
@@ -936,16 +941,19 @@
 </div>
 
 <script>
-const API_URL = 'https://platform.openai.com/chat';
 let apiKey = localStorage.getItem('ajc_api_key') || '';
+let aiProvider = localStorage.getItem('ajc_provider') || 'openai';
 
 function saveApiKey() {
   const k = document.getElementById('api-key-input').value.trim();
+  const p = document.getElementById('provider-select').value;
   if (k) {
     apiKey = k;
+    aiProvider = p;
     localStorage.setItem('ajc_api_key', k);
+    localStorage.setItem('ajc_provider', p);
     document.getElementById('api-banner-f1').style.display = 'none';
-    alert('API key saved.');
+    alert('Settings saved. Provider: ' + p);
   }
 }
 
@@ -953,6 +961,9 @@ if (apiKey) {
   const b = document.getElementById('api-banner-f1');
   if (b) b.style.display = 'none';
 }
+const savedProvider = localStorage.getItem('ajc_provider') || 'openai';
+const providerEl = document.getElementById('provider-select');
+if (providerEl) providerEl.value = savedProvider;
 
 function switchTab(id) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -963,28 +974,55 @@ function switchTab(id) {
 
 async function callClaude(systemPrompt, userMessage) {
   const key = apiKey || localStorage.getItem('ajc_api_key');
-  if (!key) throw new Error('No API key. Please enter your GPT OpenAI API key in the panel above.');
-  const res = await fetch(API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': key,
-      'gpt-version': '2023-06-01',
-      'gpt-dangerous-direct-browser-access': 'true'
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 2000,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userMessage }]
-    })
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error?.message || `API error ${res.status}`);
+  const provider = aiProvider || localStorage.getItem('ajc_provider') || 'openai';
+  if (!key) throw new Error('No API key. Please enter your API key in the settings panel.');
+
+  if (provider === 'openai') {
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + key
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        max_tokens: 2000,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userMessage }
+        ]
+      })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || 'OpenAI API error ' + res.status);
+    }
+    const data = await res.json();
+    return data.choices[0].message.content;
+
+  } else {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userMessage }]
+      })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || 'Anthropic API error ' + res.status);
+    }
+    const data = await res.json();
+    return data.content[0].text;
   }
-  const data = await res.json();
-  return data.content[0].text;
 }
 
 function parseJSON(text) {

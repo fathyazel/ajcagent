@@ -955,8 +955,8 @@
 </div>
 
 <script>
-let apiKey = localStorage.getItem('ajc_api_key') || '';
-let aiProvider = localStorage.getItem('ajc_provider') || 'openai';
+let apiKey = '';
+let aiProvider = 'gemma';
 
 function saveApiKey() {
   const k = document.getElementById('api-key-input').value.trim();
@@ -964,18 +964,12 @@ function saveApiKey() {
   if (k) {
     apiKey = k;
     aiProvider = p;
-    localStorage.setItem('ajc_api_key', k);
-    localStorage.setItem('ajc_provider', p);
     document.getElementById('api-banner-f1').style.display = 'none';
     alert('Settings saved. Provider: ' + p);
   }
 }
 
-if (apiKey) {
-  const b = document.getElementById('api-banner-f1');
-  if (b) b.style.display = 'none';
-}
-const savedProvider = localStorage.getItem('ajc_provider') || 'openai';
+const savedProvider = localStorage.getItem('ajc_provider') || 'gemma';
 const providerEl = document.getElementById('provider-select');
 if (providerEl) providerEl.value = savedProvider;
 

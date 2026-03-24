@@ -495,21 +495,26 @@
     <div class="panel-title">Input Parameters</div>
 
     <div class="api-banner" id="api-banner-f1">
-      <span>⚙</span>
-      <div style="width:100%">
-        Select your AI provider and enter your API key.
-        <div style="display:flex;gap:6px;margin-top:8px;">
-          <select id="provider-select" style="width:140px;font-size:12px;padding:7px 10px;flex-shrink:0;">
-            <option value="openai">OpenAI (GPT-4o)</option>
-            <option value="anthropic">Anthropic (Claude)</option>
-          </select>
-          <input type="password" id="api-key-input" placeholder="Paste your API key..." style="flex:1;font-size:12px;padding:7px 10px;font-family:monospace;" />
-          <button onclick="saveApiKey()" style="padding:7px 12px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-size:12px;
-            cursor:pointer;white-space:nowrap;">Save</button>
-        </div>
-        <div style="font-size:11px;margin-top:6px;color:#7a5800;">OpenAI key starts with <code>sk-...</code> &nbsp;·&nbsp; Anthropic key starts with <code>sk-ant-...</code></div>
-      </div>
-    </div>
+  <div style="display: flex; gap: 8px;">
+    <span>⚙</span>
+    <strong>AI Configuration</strong>
+  </div>
+  
+  <p style="font-size: 11px; margin-bottom: 4px;">Select provider and enter your API key to enable the agent.</p>
+  
+  <div class="api-key-row">
+    <select id="provider-select" style="width: 110px;">
+      <option value="openai">OpenAI</option>
+      <option value="anthropic">Anthropic</option>
+    </select>
+    <input type="password" id="api-key-input" placeholder="sk-..." style="flex: 1;">
+    <button onclick="saveApiKey()">Save</button>
+  </div>
+  
+  <div style="font-size: 10px; opacity: 0.8; margin-top: 4px;">
+    Keys are stored locally in your browser.
+  </div>
+</div>
 
     <div class="field-group">
       <label class="field-label">ASEAN member state <span class="field-required">*</span></label>

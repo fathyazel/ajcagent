@@ -260,7 +260,7 @@
   }
   .export-btn:hover { border-color: var(--ink3); color: var(--ink); background: var(--surface); }
   .export-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  
+
   /* ─── EMPTY STATE ─── */
   .empty-state {
     flex: 1;
@@ -393,47 +393,39 @@
   .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
   /* ─── API KEY BANNER ─── */
- /* Update these specific rules in your <style> section */
-.api-banner {
-  background: var(--gold-light);
-  border: 1px solid #e8d080;
-  border-radius: var(--radius);
-  padding: 12px; /* Increased padding */
-  font-size: 12px;
-  color: #7a5800;
-  display: flex;
-  flex-direction: column; /* Stack the text and the input row vertically */
-  gap: 10px;
-  margin-bottom: 20px; /* Give it more room at the bottom */
-  width: 100%; /* Ensure it takes full width of sidebar */
-}
-
-.api-key-row {
-  display: flex;
-  gap: 8px;
-  width: 100%;
-  align-items: center; /* Align input and button perfectly */
-}
-
-/* Add this to ensure the button doesn't shrink or hide */
-.api-key-row button {
-  flex-shrink: 0; 
-  height: 32px;
-  padding: 0 16px;
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  border-radius: var(--radius);
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: opacity 0.2s;
-}
-
-.api-key-row button:hover {
-  opacity: 0.9;
-}
+  .api-banner {
+    background: var(--gold-light);
+    border: 1px solid #e8d080;
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #7a5800;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .api-key-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .api-key-row input {
+    flex: 1;
+    font-size: 12px;
+    padding: 7px 10px;
+    font-family: monospace;
+  }
+  .api-key-row button {
+    padding: 7px 12px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
 
   /* ─── ERROR STATE ─── */
   .error-banner {
@@ -495,26 +487,21 @@
     <div class="panel-title">Input Parameters</div>
 
     <div class="api-banner" id="api-banner-f1">
-  <div style="display: flex; gap: 8px;">
-    <span>⚙</span>
-    <strong>AI Configuration</strong>
-  </div>
-  
-  <p style="font-size: 11px; margin-bottom: 4px;">Select provider and enter your API key to enable the agent.</p>
-  
-  <div class="api-key-row">
-    <select id="provider-select" style="width: 110px;">
-      <option value="gemma">Gemma</option>
-      <option value="anthropic">Anthropic</option>
-    </select>
-    <input type="password" id="api-key-input" placeholder="sk-..." style="flex: 1;">
-    <button onclick="saveApiKey()">Save</button>
-  </div>
-  
-  <div style="font-size: 10px; opacity: 0.8; margin-top: 4px;">
-    Keys are stored locally in your browser.
-  </div>
-</div>
+      <span>⚙</span>
+      <div style="width:100%">
+        Select your AI provider and enter your API key.
+        <div style="display:flex;gap:6px;margin-top:8px;">
+          <select id="provider-select" style="width:140px;font-size:12px;padding:7px 10px;flex-shrink:0;">
+            <option value="openrouter">OpenRouter (recommended)</option>
+            <option value="openai">OpenAI (GPT-4o)</option>
+            <option value="anthropic">Anthropic (Claude)</option>
+          </select>
+          <input type="password" id="api-key-input" placeholder="Paste your API key..." style="flex:1;font-size:12px;padding:7px 10px;font-family:monospace;" />
+          <button onclick="saveApiKey()" style="padding:7px 12px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-size:12px;cursor:pointer;white-space:nowrap;">Save</button>
+        </div>
+        <div style="font-size:11px;margin-top:6px;color:#7a5800;">OpenAI key starts with <code>sk-...</code> &nbsp;·&nbsp; Anthropic key starts with <code>sk-ant-...</code></div>
+      </div>
+    </div>
 
     <div class="field-group">
       <label class="field-label">ASEAN member state <span class="field-required">*</span></label>
@@ -955,8 +942,8 @@
 </div>
 
 <script>
-let apiKey = '';
-let aiProvider = 'gemma';
+let apiKey = localStorage.getItem('ajc_api_key') || '';
+let aiProvider = localStorage.getItem('ajc_provider') || 'openai';
 
 function saveApiKey() {
   const k = document.getElementById('api-key-input').value.trim();
@@ -964,12 +951,18 @@ function saveApiKey() {
   if (k) {
     apiKey = k;
     aiProvider = p;
+    localStorage.setItem('ajc_api_key', k);
+    localStorage.setItem('ajc_provider', p);
     document.getElementById('api-banner-f1').style.display = 'none';
     alert('Settings saved. Provider: ' + p);
   }
 }
 
-const savedProvider = localStorage.getItem('ajc_provider') || 'gemma';
+if (apiKey) {
+  const b = document.getElementById('api-banner-f1');
+  if (b) b.style.display = 'none';
+}
+const savedProvider = localStorage.getItem('ajc_provider') || 'openai';
 const providerEl = document.getElementById('provider-select');
 if (providerEl) providerEl.value = savedProvider;
 
@@ -982,10 +975,35 @@ function switchTab(id) {
 
 async function callClaude(systemPrompt, userMessage) {
   const key = apiKey || localStorage.getItem('ajc_api_key');
-  const provider = aiProvider || localStorage.getItem('ajc_provider') || 'openai';
-  if (!key) throw new Error('No API key. Please enter your API key in the settings panel.');
+  const provider = aiProvider || localStorage.getItem('ajc_provider') || 'openrouter';
+  if (!key) throw new Error('No API key. Please enter your API key and click Save first.');
 
-  if (provider === 'openai') {
+  if (provider === 'openrouter') {
+    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + key,
+        'HTTP-Referer': window.location.href,
+        'X-Title': 'AJC Intelligence Platform'
+      },
+      body: JSON.stringify({
+        model: 'openai/gpt-4o',
+        max_tokens: 2000,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userMessage }
+        ]
+      })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || 'OpenRouter error ' + res.status);
+    }
+    const data = await res.json();
+    return data.choices[0].message.content;
+
+  } else if (provider === 'openai') {
     const res = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -1003,7 +1021,7 @@ async function callClaude(systemPrompt, userMessage) {
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(err.error?.message || 'OpenAI API error ' + res.status);
+      throw new Error(err.error?.message || 'OpenAI error ' + res.status);
     }
     const data = await res.json();
     return data.choices[0].message.content;
@@ -1026,7 +1044,7 @@ async function callClaude(systemPrompt, userMessage) {
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(err.error?.message || 'Anthropic API error ' + res.status);
+      throw new Error(err.error?.message || 'Anthropic error ' + res.status);
     }
     const data = await res.json();
     return data.content[0].text;

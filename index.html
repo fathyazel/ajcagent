@@ -979,7 +979,7 @@ async function callClaude(systemPrompt, userMessage) {
   if (!key) throw new Error('No API key. Please enter your API key and click Save first.');
 
   if (provider === 'openrouter') {
-    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    const res = await fetch('https://openrouter.ai/google/gemma-3-27b-it:free', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -988,7 +988,7 @@ async function callClaude(systemPrompt, userMessage) {
         'X-Title': 'AJC Intelligence Platform'
       },
       body: JSON.stringify({
-        model: 'openai/gpt-4o',
+        model: 'gemma',
         max_tokens: 2000,
         messages: [
           { role: 'system', content: systemPrompt },

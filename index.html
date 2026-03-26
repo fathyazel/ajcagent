@@ -971,8 +971,38 @@ function switchTab(id) {
   document.getElementById('tab-' + id).classList.add('active');
   event.currentTarget.classList.add('active');
 }
+  function saveApiKey() {
+    const provider = document.getElementById('provider-select').value;
+    const apiKey = document.getElementById('api-key-input').value;
+    const statusMsg = document.getElementById('status-msg');
 
-async function callClaude(systemPrompt, userMessage) {
+    if (!apiKey) {
+        statusMsg.innerText = "❌ Please enter a key first.";
+        statusMsg.style.color = "#ff4d4d";
+        return;
+    }
+
+    // Securely save to local storage
+    localStorage.setItem('ajc_ai_provider', provider);
+    localStorage.setItem('ajc_api_key', apiKey);
+
+    // Feedback for the user (The "Buy-In" moment)
+    statusMsg.innerText = `✅ Settings saved! Using ${provider.toUpperCase()}.`;
+    statusMsg.style.color = "#4caf50";
+    
+    // Optional: Hide the key after saving for "Security Feel"
+    document.getElementById('api-key-input').value = "••••••••••••••••";
+}
+
+// Load existing settings when the page opens
+window.onload = function() {
+    const savedProvider = localStorage.getItem('ajc_ai_provider');
+    if (savedProvider) {
+        document.getElementById('provider-select').value = savedProvider;
+    }
+};
+
+async function callOpenRouter(systemPrompt, userMessage) {
   const key = apiKey || localStorage.getItem('ajc_api_key');
   const provider = aiProvider || localStorage.getItem('ajc_provider') || 'openrouter';
   if (!key) throw new Error('No API key. Please enter your API key and click Save first.');
@@ -1107,7 +1137,36 @@ Respond ONLY with valid JSON. No preamble, no markdown fences. Exactly this stru
 {
   "insight": "5 bullet points (use • as bullet) on strategic highlights",
   "enablers": "Relevant AJC enabler(s) with brief rationale",
-  "pathways": "Relevant pathway(s) with brief rationale",
+  "pathways": "Relevant pathway(s) with bfunction saveApiKey() {
+    const provider = document.getElementById('provider-select').value;
+    const apiKey = document.getElementById('api-key-input').value;
+    const statusMsg = document.getElementById('status-msg');
+
+    if (!apiKey) {
+        statusMsg.innerText = "❌ Please enter a key first.";
+        statusMsg.style.color = "#ff4d4d";
+        return;
+    }
+
+    // Securely save to local storage
+    localStorage.setItem('ajc_ai_provider', provider);
+    localStorage.setItem('ajc_api_key', apiKey);
+
+    // Feedback for the user (The "Buy-In" moment)
+    statusMsg.innerText = `✅ Settings saved! Using ${provider.toUpperCase()}.`;
+    statusMsg.style.color = "#4caf50";
+    
+    // Optional: Hide the key after saving for "Security Feel"
+    document.getElementById('api-key-input').value = "••••••••••••••••";
+}
+
+// Load existing settings when the page opens
+window.onload = function() {
+    const savedProvider = localStorage.getItem('ajc_ai_provider');
+    if (savedProvider) {
+        document.getElementById('provider-select').value = savedProvider;
+    }
+};rief rationale",
   "goals": "Relevant AJC 5.5 Goal(s) with brief rationale",
   "concept": "One-sentence programme concept hint",
   "kpi": "5-6 suggested KPIs as bullet points (use • as bullet)"
